@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport"
+        content="width=device-width, user-scalable=yes, initial-scale=1.0, maximum-scale=3.0, minimum-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <link rel="stylesheet" href="estilos.css">
+    <link rel="stylesheet" href="/css/sweetalert2.min.css">
+</head>
+
+<body>
+    <form class="formulario" id="formulario">
+        <h1>Login</h1>
+        <div class="contenedor">
+            <div class="input-contenedor">
+                <i class="fas fa-envelope icon"></i>
+                <input type="text" placeholder="Correo Electronico" id="correo" autofocus>
+            </div>
+            <div class="input-contenedor">
+                <i class="fas fa-key icon"></i>
+                <input type="password" placeholder="Contraseña" id="contrasenia">
+            </div>
+            <input type="submit" value="Login" class="button">
+            <p>Al registrarte, aceptas nuestras Condiciones de uso y Política de privacidad.</p>
+            <p>¿No tienes una cuenta? <a class="link" href="registrarvista.html">Registrate </a></p>
+            <p>para volver a la pagina de inicio <a class="link" href="/index.html">volver al inicio </a></p>
+        </div>
+    </form>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/sweetalert2.min.js"></script>
+    <script src="/js/config.js"></script>
+    <script>
+        let correo = $("#correo");
+        let contrasenia = $("#contrasenia");
+        let formulario = $("#formulario");
+        formulario.submit(function(e){
+            e.preventDefault();
+            login();
+        });
+
+        function login() {
+            $.ajax({
+                type: "POST",
+                url: host + '/autentificar',
+                data: {
+                    correo: correo.val(),
+                    contrasenia: contrasenia.val()
+                },
+                dataType: "json",
+                success: function (response) {
+                    if (response.sw == 'ok') {
+                        let user = JSON.stringify(response.user);
+                        localStorage.setItem("user", user);
+                        if (response.user.tipo == 'Administrador') {
+                            window.location = "/administracion/home.html";
+                        } else {
+                            window.location = "/";
+                        }
+                    } else {
+                        correo.focus()
+                        contrasenia.val("")
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Error',
+                            text: 'El usuario o contraseña son incorrectos',
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
